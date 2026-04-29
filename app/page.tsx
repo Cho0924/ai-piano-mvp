@@ -1,65 +1,104 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useRef } from 'react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export default function PianoTeacherMVP() {
+  const [isRecording, setIsRecording] = useState(false);
+  const [status, setStatus] = useState('ミミ先生：準備はいいかな？');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
+  // 1. Geminiのセットアップ
+  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
+  console.log("API Key exists:", !!process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+  // 2. 録音開始
+  const startLesson = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await analyzePerformance(audioBlob);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setStatus('ミミ先生：聴いているよ！弾いてみてね。');
+    } catch (err) {
+      alert("マイクの使用を許可してください。");
+    }
+  };
+
+  // 3. 録音停止
+  const stopLesson = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+    setStatus('ミミ先生：うーん、今の演奏はね...');
+  };
+
+  // 4. Geminiによる演奏解析
+  const analyzePerformance = async (blob: Blob) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async () => {
+      const base64Data = (reader.result as string).split(',')[1];
+
+      const prompt = `あなたは「ミミ先生」という優しいピアノの先生です。
+      送られた音声を聴いて、以下の構成で短く音声で回答してください。
+      1. 演奏の素敵なところを1つ褒める
+      2. 1つだけ具体的なアドバイスをする（例：もう少しゆっくり弾こう、など）
+      3. 「また一緒に練習しようね」と締める。`;
+
+      try {
+        const result = await model.generateContent([
+          prompt,
+          { inlineData: { data: base64Data, mimeType: "audio/webm" } }
+        ]);
+        const responseText = result.response.text();
+        setStatus(`ミミ先生：${responseText}`);
+        speak(responseText);
+      } catch (error) {
+        setStatus("ミミ先生：ごめんね、うまく聴き取れなかったみたい。もう一度聞かせて？");
+      }
+    };
+  };
+
+  // 5. ブラウザによる読み上げ
+  const speak = (text: string) => {
+    const uttr = new SpeechSynthesisUtterance(text);
+    uttr.lang = "ja-JP";
+    window.speechSynthesis.speak(uttr);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
+      <div className="text-center max-w-sm">
+        <div className="text-8xl mb-6">{isRecording ? '👂' : '🎹'}</div>
+        <h1 className="text-2xl font-bold text-blue-600 mb-2">AIピアノ先生「ミミ」</h1>
+        <div className="bg-white p-6 rounded-3xl shadow-xl mb-8 min-h-[150px] flex items-center justify-center">
+          <p className="text-gray-700 leading-relaxed">{status}</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        
+        <button
+          onMouseDown={startLesson}
+          onMouseUp={stopLesson}
+          onTouchStart={startLesson}
+          onTouchEnd={stopLesson}
+          className={`w-32 h-32 rounded-full shadow-2xl flex items-center justify-center text-white text-lg font-bold transition-transform active:scale-95 ${
+            isRecording ? 'bg-red-500 animate-pulse' : 'bg-blue-500'
+          }`}
+        >
+          {isRecording ? '終了' : '押して演奏'}
+        </button>
+        <p className="mt-4 text-gray-400 text-sm">ボタンを押している間、先生が聴いてくれます</p>
+      </div>
     </div>
   );
 }
