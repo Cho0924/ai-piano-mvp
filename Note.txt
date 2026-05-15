@@ -1,0 +1,15 @@
+＜注意点１＞
+backend側で、ずっと No module named ‘pkg_resources’ というエラーが出てきた。
+setuptoolsというライブラリに入っているモジュールで、setuptools<81にバージョン変更したら治った。
+しかし、pkg_resourcesは削除される予定という注意がログで出てきた。
+
+<string>:1: UserWarning: pkg_resources is deprecated as an API. 
+See https://setuptools.pypa.io/en/latest/pkg_resources.html. 
+The pkg_resources package is slated for removal as early as 2025-11-30. 
+Refrain from using this package or pin to Setuptools<81.
+
+＜注意点２＞
+backendを走らせると、Basic-Pitch関連で、以下のメッセージが出る。
+scikit-learn version 1.7.2 is not supported. 
+Minimum required version: 0.17. Maximum required version: 1.5.1. Disabling scikit-learn conversion API.
+これは、音声ーMIDI変換には関係ないので、無視して良い。

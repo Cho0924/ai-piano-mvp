@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: ai-piano-backend
+Version: 0.1.0
+Summary: Audio to MIDI and Gemini feedback API
+Requires-Python: <3.12,>=3.10
+Requires-Dist: fastapi>=0.110.0
+Requires-Dist: uvicorn[standard]>=0.29.0
+Requires-Dist: python-multipart>=0.0.9
+Requires-Dist: basic-pitch>=0.4.0
+Requires-Dist: pretty-midi>=0.2.11
+Requires-Dist: google-genai>=1.0.0
+Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: setuptools>=70.0.0

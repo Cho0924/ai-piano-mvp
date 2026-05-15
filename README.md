@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Piano MVP
 
-## Getting Started
+Frontend (Next.js) records audio, backend (FastAPI + Basic Pitch + pretty_midi) converts to MIDI and sends analysis to Gemini.
 
-First, run the development server:
+## System overview
+
+1. Frontend records microphone audio in the browser.
+2. Audio is uploaded to the backend API.
+3. Basic Pitch generates MIDI from the audio.
+4. pretty_midi converts MIDI into a JSON summary.
+5. Gemini analyzes the JSON and returns feedback as "Chou Sensei".
+6. Frontend displays the feedback and MIDI JSON preview.
+
+## Project structure
+
+- frontend: Next.js app
+- backend: FastAPI app (uv + Python)
+
+## Frontend
 
 ```bash
+cd frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Backend (uv)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+source .venv/bin/activate
+uv sync
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+uvicorn app.main:app --reload --port 8000
+```
 
-## Learn More
+## Notes
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Basic Pitch supports Python 3.7-3.11 (Mac M1 recommends 3.10).
+- Supported audio types: wav, mp3, ogg, flac, m4a.

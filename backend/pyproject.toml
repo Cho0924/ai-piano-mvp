@@ -1,0 +1,23 @@
+[project]
+name = "ai-piano-backend"
+version = "0.1.0"
+description = "Audio to MIDI and Gemini feedback API"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+  "fastapi>=0.110.0",
+  "uvicorn[standard]>=0.29.0",
+  "python-multipart>=0.0.9",
+  "basic-pitch>=0.4.0",
+  "pretty-midi>=0.2.11",
+  "google-genai>=1.0.0",
+  "python-dotenv>=1.0.1",
+  "setuptools>=70.0.0"
+]
+
+[tool.uv]
+package = true
+
+[dependency-groups]
+dev = [
+    "setuptools<82",
+]

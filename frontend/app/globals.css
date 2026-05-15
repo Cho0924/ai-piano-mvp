@@ -1,0 +1,119 @@
+:root {
+  --bg: #f6f1ea;
+  --card: #ffffff;
+  --ink: #1a1a1a;
+  --accent: #b64b2a;
+  --muted: #6d6a67;
+  --border: #e1d8cd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino", "Times New Roman", serif;
+  background: radial-gradient(1200px 800px at 20% 0%, #fff7ef 0%, #f6f1ea 55%, #efe5da 100%);
+  color: var(--ink);
+}
+
+main {
+  min-height: 100vh;
+  padding: 48px 20px 64px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: min(920px, 100%);
+  display: grid;
+  gap: 24px;
+}
+
+.header {
+  display: grid;
+  gap: 8px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 44px);
+  letter-spacing: 0.02em;
+}
+
+.header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 12px 32px rgba(16, 16, 16, 0.08);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 15px;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(182, 75, 42, 0.25);
+}
+
+.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.status {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.feedback {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.midi-json {
+  background: #f9f5f0;
+  border-radius: 12px;
+  padding: 16px;
+  max-height: 280px;
+  overflow: auto;
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #3f3a35;
+}
+
+@media (max-width: 600px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
