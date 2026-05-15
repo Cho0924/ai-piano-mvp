@@ -27,9 +27,13 @@ npm run dev
 ## Backend (uv)
 
 ```bash
+cd backend
+uv venv
 source .venv/bin/activate
 uv sync
 ```
+
+Create a `backend/.env` file and set `GEMINI_API_KEY` (refer to `backend/.env.example`).
 
 ```bash
 uvicorn app.main:app --reload --port 8000

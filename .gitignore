@@ -20,9 +20,8 @@ __pycache__/
 .venv/
 
 # Env files
-.env
-.env.local
-.env.*
+backend/.env
+!**/.env.example
 
 # Editor
 .vscode/
